@@ -3,6 +3,7 @@ package nonpersistent
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -29,10 +30,14 @@ func BenchmarkSubscriber(b *testing.B) {
 			rc,
 			&DefaultMarshaller{},
 			logger,
+			1,
 		)
 		if err != nil {
 			panic(err)
 		}
+
+		// Warten, damit Subscriber bereit ist (wichtig für Redis Pub/Sub)
+		time.Sleep(100 * time.Millisecond)
 
 		return publisher, subscriber
 	})

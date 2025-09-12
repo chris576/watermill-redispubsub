@@ -44,7 +44,7 @@ func newPubSub(t *testing.T, marshaler MarshalerUnmarshaler) (message.Publisher,
 	publisher, err := NewPublisher(ctx, rc, marshaler, logger)
 	require.NoError(t, err)
 
-	subscriber, err := NewSubscriber(ctx, rc, marshaler, logger)
+	subscriber, err := NewSubscriber(ctx, rc, marshaler, logger, 1)
 	require.NoError(t, err)
 
 	return publisher, subscriber
@@ -93,7 +93,7 @@ func TestFanOut(t *testing.T) {
 
 	// Subscriber starten
 	for i := 0; i < subscriberCount; i++ {
-		s, err := NewSubscriber(ctx, rc, &DefaultMarshaller{}, watermill.NewStdLogger(true, false))
+		s, err := NewSubscriber(ctx, rc, &DefaultMarshaller{}, watermill.NewStdLogger(true, false), 1)
 		require.NoError(t, err)
 		subscribers[i] = s
 

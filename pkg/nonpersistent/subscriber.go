@@ -16,6 +16,7 @@ type Subscriber struct {
 	ctx context.Context
 	rc  redis.UniversalClient
 
+	buffersize   int
 	unmarshaller Unmarshaller
 	logger       watermill.LoggerAdapter
 
@@ -30,6 +31,7 @@ func NewSubscriber(
 	rc redis.UniversalClient,
 	unmarshaller Unmarshaller,
 	logger watermill.LoggerAdapter,
+	buffersize int,
 ) (message.Subscriber, error) {
 	if logger == nil {
 		logger = &watermill.NopLogger{}
@@ -41,6 +43,8 @@ func NewSubscriber(
 		unmarshaller: unmarshaller,
 		logger:       logger,
 		closing:      make(chan struct{}),
+		buffersize:   buffersize,
+		closed:       false,
 	}, nil
 }
 
@@ -58,7 +62,7 @@ func (s *Subscriber) Subscribe(ctx context.Context, topic string) (<-chan *messa
 	}
 	s.logger.Info("Subscribing to redis pubsub channel", logFields)
 
-	output := make(chan *message.Message)
+	output := make(chan *message.Message, s.buffersize)
 
 	consumeClosed, err := s.consumeMessages(ctx, topic, output, logFields)
 	if err != nil {
@@ -169,7 +173,6 @@ func (h *messageHandler) processMessage(
 ) error {
 	receivedFields := logFields.Add(watermill.LogFields{
 		"redis_channel": xm.Channel,
-		"raw_payload":   xm.Payload,
 	})
 
 	h.logger.Trace("Received message from redis pubsub", receivedFields)
@@ -179,12 +182,23 @@ func (h *messageHandler) processMessage(
 		return errors.Wrap(err, "message unmarshal failed")
 	}
 
+	// Context an Message hängen
 	ctx, cancel := context.WithCancel(ctx)
 	msg.SetContext(ctx)
-	defer cancel()
 
+	// Nachricht in den gepufferten Output-Channel legen
 	h.outputChannel <- msg
-	msg.Ack()
+
+	// NICHT sofort ack! -> das macht BulkRead / der Konsument
 	h.logger.Trace("Message delivered to output channel", receivedFields.Add(watermill.LogFields{"uuid": msg.UUID}))
+
+	// Cancel darf erst passieren, wenn die Message nicht mehr gebraucht wird
+	// -> hier nicht direkt defer cancel() verwenden, sonst invalidierst du Context zu früh
+	// Stattdessen: Message-Lifetime dem Konsumenten überlassen
+	go func() {
+		<-msg.Acked() // wartet bis Konsument ack/nack macht
+		cancel()
+	}()
+
 	return nil
 }

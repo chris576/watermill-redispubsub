@@ -1,4 +1,4 @@
-package redis
+package persistent
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Publisher publishes messages to redis streams via XADD.
 type Publisher struct {
 	ctx        context.Context
 	config     PublisherConfig

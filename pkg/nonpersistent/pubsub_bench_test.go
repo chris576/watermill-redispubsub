@@ -1,4 +1,4 @@
-package redis
+package nonpersistent
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/tests"
-	"github.com/renstrom/shortuuid"
 )
 
 func BenchmarkSubscriber(b *testing.B) {
@@ -20,17 +19,13 @@ func BenchmarkSubscriber(b *testing.B) {
 	tests.BenchSubscriber(b, func(n int) (message.Publisher, message.Subscriber) {
 		logger := watermill.NopLogger{}
 
-		publisher, err := NewPublisher(ctx, PublisherConfig{}, rc, &DefaultMarshaller{}, logger)
+		publisher, err := NewPublisher(ctx, rc, &DefaultMarshaller{}, logger)
 		if err != nil {
 			panic(err)
 		}
 
 		subscriber, err := NewSubscriber(
 			ctx,
-			SubscriberConfig{
-				Consumer:      shortuuid.New(),
-				ConsumerGroup: shortuuid.New(),
-			},
 			rc,
 			&DefaultMarshaller{},
 			logger,

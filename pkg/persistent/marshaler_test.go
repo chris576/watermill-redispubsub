@@ -1,4 +1,4 @@
-package redis
+package persistent
 
 import (
 	"testing"

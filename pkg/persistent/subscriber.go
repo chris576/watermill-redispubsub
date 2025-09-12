@@ -1,4 +1,4 @@
-package redis
+package persistent
 
 import (
 	"context"
@@ -34,6 +34,7 @@ const (
 	DefaultMaxIdleTime time.Duration = time.Second * 60
 )
 
+// Subscriber subscribes to redis streams via XREAD or XREADGROUP
 type Subscriber struct {
 	ctx    context.Context
 	config SubscriberConfig

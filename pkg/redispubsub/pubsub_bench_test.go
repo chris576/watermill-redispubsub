@@ -1,4 +1,4 @@
-package nonpersistent
+package redispubsub
 
 import (
 	"context"

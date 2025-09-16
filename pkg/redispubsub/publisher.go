@@ -1,12 +1,12 @@
-package nonpersistent
+package redispubsub
 
 import (
 	"context"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 )
 
 // Publisher publishes messages to Redis Pub/Sub channels.

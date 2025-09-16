@@ -1,4 +1,4 @@
-package persistent
+package redisstream
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/tests"
-	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"github.com/renstrom/shortuuid"
 	"github.com/stretchr/testify/require"
 )

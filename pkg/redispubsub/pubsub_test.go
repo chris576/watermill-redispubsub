@@ -1,4 +1,4 @@
-package nonpersistent
+package redispubsub
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
-	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"github.com/renstrom/shortuuid"
 	"github.com/stretchr/testify/require"
 )

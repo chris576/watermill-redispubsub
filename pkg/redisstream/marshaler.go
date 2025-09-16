@@ -1,4 +1,4 @@
-package persistent
+package redisstream
 
 import (
 	"github.com/ThreeDotsLabs/watermill/message"

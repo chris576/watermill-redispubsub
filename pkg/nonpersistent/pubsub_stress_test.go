@@ -1,7 +1,7 @@
 //go:build stress
 // +build stress
 
-package persistent
+package nonpersistent
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ func TestPublishSubscribe_stress(t *testing.T) {
 	tests.TestPubSubStressTest(
 		t,
 		tests.Features{
-			ConsumerGroups:                      false,
+			ConsumerGroups:                      true,
 			ExactlyOnceDelivery:                 true,
 			GuaranteedOrder:                     false,
 			GuaranteedOrderWithSingleSubscriber: false,
@@ -29,7 +29,7 @@ func TestPublishSubscribe_ordered_stress(t *testing.T) {
 	tests.TestPubSubStressTest(
 		t,
 		tests.Features{
-			ConsumerGroups:                      false,
+			ConsumerGroups:                      true,
 			ExactlyOnceDelivery:                 true,
 			GuaranteedOrder:                     false,
 			GuaranteedOrderWithSingleSubscriber: true,

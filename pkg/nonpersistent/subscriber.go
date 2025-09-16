@@ -109,19 +109,26 @@ func (s *Subscriber) consumePubSub(
 	messageHandler := s.createMessageHandler(output)
 	consumeClosed := make(chan struct{})
 
+	ready := make(chan struct{})
+	// Sicherstellen, dass der Goroutine gestartet ist, bevor wir zurückkehren
 	go func() {
 		defer close(consumeClosed)
 
+		s.logger.Debug("Start listening to subscription channel.", logFields)
 		pubsub := s.rc.Subscribe(ctx, channel)
 		ch := pubsub.Channel()
-
+		s.logger.Debug("Subscribed to Redis channel", logFields.Add(watermill.LogFields{"channel": channel}))
+		close(ready)
 		for {
+			s.logger.Trace("Waiting for message or shutdown signal", logFields)
+
 			select {
 			case msg, ok := <-ch:
 				if !ok {
 					s.logger.Debug("Redis pubsub channel closed", logFields)
 					return
 				}
+				s.logger.Debug("Message received from redis pubsub", logFields.Add(watermill.LogFields{"redis_channel": msg.Channel}))
 				if err := messageHandler.processMessage(ctx, msg, logFields); err != nil {
 					s.logger.Error("processMessage failed", err, logFields)
 					return
@@ -137,7 +144,7 @@ func (s *Subscriber) consumePubSub(
 			}
 		}
 	}()
-
+	<-ready // warten, bis der Goroutine gestartet ist
 	return consumeClosed, nil
 }
 

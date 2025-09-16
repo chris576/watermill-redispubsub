@@ -18,7 +18,7 @@ func BenchmarkSubscriber(b *testing.B) {
 		b.Fatal(err)
 	}
 	tests.BenchSubscriber(b, func(n int) (message.Publisher, message.Subscriber) {
-		logger := watermill.NopLogger{}
+		logger := watermill.NewStdLogger(true, true)
 
 		publisher, err := NewPublisher(ctx, rc, &DefaultMarshaller{}, logger)
 		if err != nil {

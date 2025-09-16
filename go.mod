@@ -1,4 +1,4 @@
-module github.com/minghsu0107/watermill-redistream
+module github.com/chris576/watermill-redispubsub
 
 go 1.15
 
